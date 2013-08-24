@@ -1,1 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>測試</title>
+<link rel="stylesheet" href="css\style.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="css\bootstrap.css" type="text/css" media="screen" />
+<script src="js\jquery-1.6.2.js"></script>
+<!--<script src="d3\d3.v3.js"></script>-->
+<!--<script src="js\bootstrap.js"></script>-->
+
+<script>
+var scale_name=['C','bD','D','bE','E','F','bG','G','bA','A','bB','B'];
+var scale5_name=[]
+for (var i = 0; i < scale_name.length; i++) {
+  scale5_name.push(scale_name[i*5%12]);
 };
+console.log(scale5_name);
+</script>      
+
+</head>
+<body>
+<div id="container">
+
+<div id='title'>
+<h1>II-V-I大挑戰</h1>
+<h3>儘可能找出所有II-V-I吧</h3>
+</div>
+
+<div id='page1'>
+
+<button id='btn_start' class='btn btn-primary dropdown-toggle'>開始</button>
+
+</div>
+<div id='page2' style="display: none;">
+  
+  <div id='question'>
+  </div>
+  <div id='selections'>
+  </div>
+  <div id='result'>
+  </div>
+  <div id='info'>
+    這是第<span id='rounds'>?</span>題<br>
+    目前答對<span id='corrects'>?</span>題<br>
+    連續答對<span id='combos'>?</span>題
+  </div>
+
+</div>
+
+</div>
+<script type='text/javascript'>
+//變數
+//目前狀態:0未開始,1已開始
+var gstate=0;
+//題目:0~11
+ var scale_no;
+ //空格:0~2
+ var space_no;
+ 
+ //目前題目數量
+ var rounds=0;
+
+ //目前答對數量
+ var corrects=0;
+
+ //目前連續答對數量
+ var combos=0;
+
+//畫面
+  $('#btn_start').click(function(){
+    $('#page1').hide('fast',function(){
+      $('#page2').show('fast');
+    });
+    
+    give_question();
+  });
+
+  //selections
+  for (var i = 0; i < 12; i++) {
+    $('div#selections')
+    .append($('<button id="btn_'+i+'"></button>'))
+    $('#btn_'+i).attr('class','btn btn-primary dropdown-toggle')
+    .text(scale_name[i])
+    .click(press_btn);
+  };
+  
+
+  //動作
+  function press_btn(){
+    if(gstate==1){
+      var i=$(this).attr('id').split('btn_')[1];
+      console.log('i=',i);
+      console.log('scale_name[i]=',scale_name[i]);
+      console.log('scale_no=',scale_no);
+      console.log('space_no=',space_no);
+      console.log('scale5_name[(scale_no+space_no)%12]=',scale5_name[(scale_no+space_no)%12]);
+      if(scale_name[i]==scale5_name[(scale_no+space_no)%12]){
+        $('#result').html('<p>答對囉!</p>');
+        combos++;
+        corrects++;
+      }else{
+        $('#result').html('<p>答錯了</p>');
+        combos=0;
+      }
+      $('#info').hide('slow',function(){
+         give_question();
+         $('#info').show('slow');
+      })
+
+
+
+    }
+  }
+
+  function give_question(){
+    rounds++;
+    gstate=1;
+    do{
+      new_scale_no=Math.floor(Math.random()*12);
+    }while(new_scale_no==scale_no)
+    scale_no=new_scale_no;
+
+    space_no=Math.floor(Math.random()*3);
+    var question123=[]
+    for (var i = 0; i < 3; i++) {
+      if(i==space_no)question123.push("( )")
+        else question123.push(scale5_name[(scale_no+i+12)%12]);
+    };
+    var question_text=question123[0]+'-->'+question123[1]+'-->'+question123[2];
+
+    $('div#question').html(question_text);
+
+    update_info();
+  }
+
+  function update_info(){
+    $('#rounds').text(rounds);
+    $('#corrects').text(corrects);
+    $('#combos').text(combos);
+  }
+</script>
+
+</body>
+</html>
